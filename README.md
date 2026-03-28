@@ -21,6 +21,7 @@ sends high-value leads to Discord using n8n automation.
 - `My workflow.json` - n8n workflow export
 - `Screenshot discord.png` - successful Discord output
 - `logic_log.txt` - rate limit handling explanation
+- `Screenshot n8n workflow.png` - n8n workflow screenshot 
 
 ## Demo
 [Watch Demo Recording] https://drive.google.com/file/d/1vOzVSHKDzHszTWPOQAtZwJTcI7xkFqb2/view?usp=sharing
