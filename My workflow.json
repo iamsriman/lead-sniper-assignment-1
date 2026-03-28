@@ -1,0 +1,390 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/n8n-io/n8n/stargazers?per_page=5",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "token YOUR_GITHUB_PAT_HERE"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3+json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3c0ee39f-fbb2-4745-a493-33ae5f49ad15",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b0a4ba7d-1471-4518-a6ca-4a5ba639b408",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9eeeef55-7a7c-4564-a610-7a0767c1e714",
+              "name": "login",
+              "value": "={{ $json.login }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        0
+      ],
+      "id": "e75e0d33-856f-4ecb-940e-ced592902f71",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst processedUsers = $getWorkflowStaticData('global');\n\n\nif (!processedUsers.users) {\n  processedUsers.users = [];\n}\n\nconst username = $json.login;\n\nif (processedUsers.users.includes(username)) {\n  return []; \n}\n\nprocessedUsers.users.push(username);\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "86cb58a9-2c9a-46d0-b137-bb69a7fc3713",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/users/{{ $json.login }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "token YOUR_GITHUB_PAT_HERE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        816,
+        0
+      ],
+      "id": "bec771e6-1c39-495d-911b-254c0f44ce23",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        224
+      ],
+      "id": "68a7c790-8251-4c54-967d-b163330c4022",
+      "name": "Wait",
+      "webhookId": "daf39508-172e-4d63-a007-1be10fb5dd26"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/webhooks/1486645400239607921/aEB6-kahiL-NhmtoSL4Q_ePFGtu0UCGRZfVcFoIVth1klI7byWhK6JBKYnQVaFRg58JL",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=New High-Value Lead!\nName: {{ $('HTTP Request1').item.json.name !== null ? $('HTTP Request1').item.json.name : 'Unknown' }}\nCompany: {{ $('HTTP Request1').item.json.company !== null ? $('HTTP Request1').item.json.company : 'Independent' }}\nBio: {{ $('HTTP Request1').item.json.bio !== null ? $('HTTP Request1').item.json.bio : 'No bio provided' }}\nFollowers: {{ $('HTTP Request1').item.json.followers !== null ? $('HTTP Request1').item.json.followers : 0 }}\nPublic Repos: {{ $('HTTP Request1').item.json.public_repos !== null ? $('HTTP Request1').item.json.public_repos : 0 }}\nLocation: {{ $('HTTP Request1').item.json.location !== null ? $('HTTP Request1').item.json.location : 'Unknown' }}\nAI Pitch: {{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1488,
+        208
+      ],
+      "id": "67e1dbe0-fe32-45a5-800d-c8a1723b51ba",
+      "name": "HTTP Request2",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1296,
+        208
+      ],
+      "id": "acd3c74d-7a19-4a10-9e5e-a5523c3f0fa8",
+      "name": "Wait1",
+      "webhookId": "34ca35ce-a0f4-420b-8022-5d5a2325e40f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bafed32b-ea01-439f-85c3-57f82dc72e22",
+              "leftValue": "={{ $json.followers }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "aa6dbcc4-e598-431c-8efd-81ded89808a0",
+              "leftValue": "={{ $json.public_repos }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        224
+      ],
+      "id": "d116e3fb-8304-464c-99ad-e3e5c34fbb0a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        208
+      ],
+      "id": "b736a167-d30b-4241-8a32-b4eae629c962",
+      "name": "Wait2",
+      "webhookId": "642e718b-94c6-437e-8ff5-4ba5c1b20ac4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a sales assistant. Based on the following GitHub user profile, write exactly 1 concise sentence explaining why we should reach out to them as a potential lead.\n\nName: {{ $('HTTP Request1').item.json.name || 'Unknown' }}\nCompany: {{ $('HTTP Request1').item.json.company || 'Independent' }}\nBio: {{ $('HTTP Request1').item.json.bio || 'No bio available' }}\nFollowers: {{ $('HTTP Request1').item.json.followers || 0 }}\nPublic Repos: {{ $('HTTP Request1').item.json.public_repos || 0 }}\nLocation: {{ $('HTTP Request1').item.json.location || 'Unknown location' }}\n\nRespond with only the 1-sentence pitch. No preamble.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        976,
+        208
+      ],
+      "id": "9b50bb19-e1b7-47ea-b29a-fc388d417027",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        912,
+        416
+      ],
+      "id": "304775dd-5aa0-4c99-8982-eb03199b8929",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Bmn5owQ3MIjOYAeo",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "15b70c64-e5f2-4eca-ae5d-23aa759089df",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9e3de850b9f7daa311014ecf88670156aba8561edff8c8289cd2b262cbc25fbc"
+  },
+  "id": "hwdgnONXkqWwkYWu",
+  "tags": []
+}
