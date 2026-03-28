@@ -1,4 +1,3 @@
-# lead-sniper-assignment-1
 # Lead Sniper - Assignment 1
 
 ## What it does
